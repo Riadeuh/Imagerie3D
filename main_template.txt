@@ -1,0 +1,235 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+###########
+# IMPORTS #
+###########
+import tools
+import os
+###########
+
+#function to execute an exercise
+def exe_exo(num_exo):
+
+    if(num_exo == 0):
+        ####################################
+        #              exo:00              #
+        # Read, Write and Display an image #
+        ####################################
+
+        #path of image to convert
+        image_path = "data/DSC03017.tiff"
+        #image output path
+        image_output_path = os.path.join("VISU", "VISU_" + os.path.splitext(os.path.basename(image_path))[0] + "_to8b.tiff")
+
+        #convert .tiff image to a numpy array
+        img_arr = tools.img_2_arr(
+                                  image_path,
+                                  showInfos=True,
+                                  toDisk=True,
+                                  image_output_path=image_output_path
+                                 )
+
+    #elif(num_exo == 1):
+        ############################################################
+        #                         exo:01                           #
+        # Compute Flat-Field and Dark-Noise Correction "Vignettes" #
+        ############################################################
+
+        #folder path for DN calib images
+        #...
+        #image output path
+        #...
+        #calculate average DN images
+        #... = tools.calc_avrg_arr(...)
+
+        #folder path for FF calib images
+        #...
+        #image output path
+        #...
+        #calculate average FF images
+        #.. = tools.calc_avrg_arr(...)
+    
+    #elif(num_exo == 2):
+        ######################################################################
+        #                               exo:02                               #
+        # Apply Flat-Field and Dark-Noise Correction "Vignettes" to an image #
+        ######################################################################
+
+        #path of image to correct
+        #...
+        #image output path (no correction)
+        #...
+        #image output path (with correction)
+        #...
+
+        #apply FF and DN correction
+        #... = tools.apply_FF_DN_corr(...)
+
+    #elif(num_exo == 3):
+        ####################################################
+        #                      exo:03                      #
+        # Extract R,G,B bands from a (developed) RAW image #
+        ####################################################
+
+        #image path to test
+        #...
+
+        #image output paths for individual bands
+        #...
+        #...
+        #...
+        #split individual bands
+        #... = tools.splitBands(...)
+
+    #elif(num_exo == 4):
+        ################################
+        #            exo:04            #
+        # Interpolate individual bands #
+        ################################
+
+        #image path to test
+        #...
+
+        #image output paths for individual bands
+        #...
+        #...
+        #...
+
+        #split individual bands
+        #... = tools.splitBands(...)
+
+        #interpolate R,G,B bands
+        #... = tools.interpBands(...)
+
+    #elif(num_exo == 5):
+        ###################
+        #      exo:05     #
+        # Build RGB image #
+        ###################
+
+        #image path to test
+        #...
+
+        #image output path for RGB image
+        #...
+
+        #split individual bands
+        #... = tools.splitBands(...)
+
+        #interpolate R,G,B bands
+        #... = tools.interpBands(...)
+
+        #build RGB image
+        #... = tools.buildRGB(...)
+
+    #elif(num_exo == 6):
+        ########################
+        #        exo:06        #
+        # FF, DN, Demoisaicing #
+        ########################
+
+        #image path to test
+        #...
+
+        #image output path
+        #...
+
+        #apply FF and DN correction
+        #... = tools.apply_FF_DN_corr(...)
+        
+        #split individual bands
+        #... = tools.splitBands(...)
+
+        #interpolate R,G,B bands
+        #... = tools.interpBands(...)
+
+        #build RGB image
+        #... = tools.buildRGB(...)
+
+    #elif(num_exo == 7):
+        ############################################################################
+        #                                  exo:07                                  #
+        # read xyz calibration file, ij measurements file and plot points on image #
+        ############################################################################
+        #xyz calibration file
+        #...
+        #read xyz calibration file
+        #... = tools.read_calib_file(...)
+
+        #ij measurements file
+        #...
+        #read ij measurements file
+        #... = tools.read_img_coords_file(...)
+
+        #path color calibration image
+        #...
+        #image output path
+        #...
+        #plot points
+        #tools.plot_pts_on_img(...)
+
+    #elif(num_exo == 8):
+        ###########################
+        #         exo:08          #
+        # estimate ICC parameters #
+        ###########################
+
+        #color calibration image path
+        #...
+
+        #image output path RGB
+        #...
+        #image output path RGB+ICC
+        #...
+
+        #apply FF and DN correction
+        #... = tools.apply_FF_DN_corr(...)
+
+        #split individual bands
+        #... = tools.splitBands(...)
+        
+        #interpolate R,G,B bands
+        #... = tools.interpBands(...)
+
+        #build RGB image
+        #... = tools.buildRGB(...)
+        
+        #read calibration files
+        #... = tools.read_calib_file(...)
+        #read ij measurements file
+        #... = tools.read_img_coords_file(...)
+
+        #estimate ICC params
+        #... = tools.estimICC(...)
+
+
+        #apply ICC (quality check)
+        #output_arr = tools.applyICC(...)
+        
+    #elif(num_exo == 9):
+        #############################
+        #          exo:09           #
+        # FF, DN, Demoisaicing, ICC #
+        #############################
+        #image path to correct
+        #...
+
+        #image output path RGB
+        #...
+        #image output path RGB+ICC
+        #...
+        
+        #.
+        #.
+        #.
+
+    else:
+        print("Invalid exercise number")
+
+
+
+#main
+if __name__ == "__main__":
+    num_exo = int(input("Enter the exercise number to execute (0,1,2,...): "))
+    exe_exo(num_exo)

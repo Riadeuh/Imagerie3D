@@ -1,0 +1,578 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+###########
+# IMPORTS #
+###########
+import os
+import numpy as np
+from PIL import Image
+import matplotlib.pyplot as plt
+###########
+
+xyz_2_rgb = np.array([[1.7552599,-0.4836786,-0.2530000],
+                      [-0.5441336,1.5068789,0.0215528],
+                      [0.0063467,-0.0175761,1.2256959]])
+                          
+#######################################################
+#function to convert an input image into a numpy array
+#######################################################
+def img_2_arr(
+              image_path,
+              showInfos=False,
+              toDisk=False,
+              image_output_path=""
+             ):
+
+     try:
+         with Image.open(image_path) as image:
+
+             #transform to an array
+             img_arr = np.array(image)
+           
+             #make the array float for precise computation
+             img_arr = img_arr.astype(np.float32)
+           
+             #if we want to write the image to a file for visualization
+             if(toDisk):
+                 arr_2_file(
+                            img_arr,
+                            image_output_path,
+                            showInfos=showInfos
+                            )
+               
+         return img_arr
+       
+     except Exception as e:
+         print("Error:", e)
+         return None
+
+######################################################
+#function to display some statistics on a numpy array
+######################################################
+def infos_arr(
+              arr,
+              title="Statistics"
+             ):
+
+    print("************ %s ************" % title)
+    print("Shape of array  =", arr.shape)
+    print("Type of array  =", arr.dtype)
+
+
+    if(arr.ndim == 2):
+        print("Image Type     = 1 band")
+        print("Min image val  = %.1f" % np.min(arr))
+        print("Max image val  = %.1f" % np.max(arr))
+        print("Mean image val = %.1f" % np.mean(arr))
+        print("Median image val = %.1f" % np.median(arr))
+    
+    elif(arr.ndim == 3 and arr.shape[2] == 3):
+        print("Image Type     = 3 bands (RGB)")
+        for i, color in enumerate(["Red  ", "Green", "Blue "]):
+            print(f"{color} - Min: %.1f, Max: %.1f, Mean: %.1f, Median: %.1f" % (np.min(arr[:,:,i]), np.max(arr[:,:,i]), np.mean(arr[:,:,i]), np.median(arr[:,:,i])))
+    
+    else:
+        print("Warning: Unsupported array shape", arr.shape)
+
+    print("*" * (26 + len(title)))
+    
+    return None
+
+####################################################################
+#function to perform an 8 bit range normalization of an input array
+####################################################################
+def to8b(arr,stretch=True):
+
+    # Normalize 14-bit data stored in 16-bit format
+    image_8bit = 255.0 * (arr / (2**14 - 1))
+
+    # Clip values to 8-bit range
+    image_8bit = np.clip(image_8bit, 0, 255)
+
+    # Stretch the histogram to cover the full 8-bit range
+    if(stretch):
+        if(arr.ndim == 2):  # Single channel
+            min_val, max_val = np.min(image_8bit), np.max(image_8bit)
+
+        elif(arr.ndim == 3):  # Multi-channel
+            min_val, max_val = np.min(image_8bit, axis=(0,1)), np.max(image_8bit, axis=(0,1))
+        
+        image_8bit = (image_8bit - min_val) / (max_val - min_val) * 255
+
+    #convert uint8
+    new_arr = image_8bit.astype(np.uint8)
+     
+    return new_arr
+
+####################################################
+#function to write a numpy array to file as an image
+####################################################
+def arr_2_file(
+               arr,
+               image_output_path,
+               showInfos=False
+               ):
+    try:
+		#init
+        output_arr = np.zeros((arr.shape))
+        
+        #if we want to display statistics (before)
+        if(showInfos):
+            infos_arr(
+                      arr,
+                      title="Infos before to8b"
+                     )
+          
+        #convert to 8 bits
+        output_arr = to8b(
+                          arr,
+                          stretch=True
+                         )
+
+        #if we want to display statistics (after)
+        if(showInfos):
+                infos_arr(
+                          output_arr,
+                          title="Infos after to8b"
+                          )
+              
+        #write image to disk
+        Image.fromarray(output_arr).save(image_output_path)
+        print("Image successfully saved as: ",image_output_path)
+      
+    except Exception as e:
+        print("Error:", e)
+
+####################################################
+#function to compute the average of a list of arrays
+####################################################
+#def calc_avrg_arr(
+#                 input folder path,
+#                 a prefix filter ?,
+#                 a suffix/extension filter ?,
+#                 bool to write the image to disk ?,
+#                 bool to display some informations ?,
+#                 output image path,
+#                ):
+
+    #list of images
+    #...
+    
+    #iterate over the files in the folder
+    #for ... in ...:
+        #filter the files based on the prefix and suffix
+        #if(...):
+            #get the image path
+            #...
+            #convert the image to an array
+            #... = img_2_arr(...)
+            #append the array to the list
+            #...
+            
+    #stack arrays
+    #...
+    
+    #average arrays
+    #...
+    
+    #if we want to write the image to a file for visualization
+    #if(...):
+        #arr_2_file(...)
+    
+    #return ...
+
+####################################################################
+#function to apply Dark Noise and Flat Field correction to and image
+####################################################################
+#def apply_FF_DN_corr(
+#                     inpu numpy array,
+#                     dark noise data,
+#                     flat field data,
+#                     bool to write the image to disk ?,
+#                     bool to display some informations ?,
+#                     output image path,
+#                    ):
+
+    #check type of dn if it's a folder or a numpy array
+    #if(...):
+        #dn_arr = calc_avrg_arr(...)
+    #elif(...):
+        #...
+    #else:
+        #print("Error: Unsupported type for dn")
+        #return None
+    
+    #check type of ff if it's a folder or a numpy array
+    #if(...):
+        #ff_arr = calc_avrg_arr(...)
+    #elif(...):
+        #...
+    #else:
+        #print("Error: Unsupported type for ff")
+        #return None
+    
+    #scalar value
+    #...
+
+    #corrected numpy array
+    #...
+
+    #clipping
+    #...
+
+    #if we want to display some informations
+    #if(...):
+        #infos_arr(...)
+    
+    #if we want to write the image to a file for visualization
+    #if(...):
+        #arr_2_file(...)
+    
+    #return ...
+
+########################
+#function to split bands
+########################
+#def splitBands(
+#               input numpy array,
+#               bool to write the bands to disk ?,
+#               bool to display some informations ?,
+#               output image path R,
+#               output image path G,
+#               output image path B
+#              ):
+
+    #init channels
+    #...#Red
+    #...#Green
+    #...#Blue
+    
+    #extract channels using bayer matrice structure
+    #...   #Red
+    #...   #Green
+    #...   #Green
+    #...   #Blue
+    
+    #if we want to write the bands to disk
+    #if(...):
+        #arr_2_file(...)#Red
+        #arr_2_file(...)#Green
+        #arr_2_file(...)#Blue
+
+    #return ...
+
+#################################
+#function to interpolate Red band
+#################################
+#def interpR(
+#            input numpy array (red),
+#            i index,
+#            j index
+#            ):
+    
+    #init value
+    #px_val = ...
+    
+    # i & j are even (e,e)
+    #if(...):
+        #px_val = ...
+
+    # i is even and j is odd (e,o)
+    #elif(...):
+        #px_val = ...
+
+    # i is odd and j is even (o,e)
+    #elif(...):
+        #px_val = ...
+
+    # i and j are odd (o,o)
+    #else:
+        #px_val = ...
+        
+    #return ...
+
+###################################
+#function to interpolate Green band
+###################################
+#def interpG(
+#            input numpy array (green)
+#            i index,
+#            j index
+#           ):
+
+    #init value
+    #px_val = ...
+    
+    # i & j are even (e,e)
+    #if(...):
+        #px_val = ...
+
+    # i is even and j is odd (e,o)
+    #elif(...):
+        #px_val = ...
+
+    # i is odd and j is even (o,e)
+    #elif(...):
+        #px_val = ...
+
+    # i and j are odd (o,o)
+    #else:
+        #px_val = ...
+        
+    #return ...
+
+##################################
+#function to interpolate Blue band
+##################################
+#def interpB(
+#            input numpy array (blue)
+#            i index,
+#            j index
+#          ):
+
+    #init value
+    #px_val = ...
+    
+    # i & j are even (e,e)
+    #if(...):
+        #px_val = ...
+
+    # i is even and j is odd (e,o)
+    #elif(...):
+        #px_val = ...
+
+    # i is odd and j is even (o,e)
+    #elif(...):
+        #px_val = ...
+
+    # i and j are odd (o,o)
+    #else:
+        #px_val = ...
+        
+    #return ...
+
+##################################
+#function to interpolate RGB bands
+##################################
+#def interpBands(
+#                input numpy array (red),
+#                input numpy array (green),
+#                input numpy array (blue),
+#                bool to write the bands to disk ?,
+#                bool to display some informations ?,
+#                output image path iR,
+#                output image path iG,
+#                output image path iB
+#                ):
+    
+   #channels must have the same size
+   #if(...):
+
+       #get dimensions
+       #...
+
+       #initialize output channels
+       #... #iR
+       #... #iG
+       #... #iB
+       
+       # iterate over rows
+       #...
+           #iterate over columns
+           #...
+               
+               #interpolation for each channel
+               #r_val = ...
+               #g_val = ...
+               #b_val = ...
+
+               #assign RGB values to output arrays
+               #... #R
+               #... #G
+               #... #B
+           
+       #write image
+       #if(...):
+           #arr_2_file(...) #R
+           #arr_2_file(...) #G
+           #arr_2_file(...) #B
+           
+       #return ...
+   #else:
+       #print("arrays do not have the same size.")
+       #return None
+
+###############################
+#function to build an RGB image
+###############################
+#def buildRGB(
+#             input numpy array (red),
+#             input numpy array (green),
+#             input numpy array (blue),
+#             bool to write the bands to disk ?,
+#             bool to display some informations ?,
+#             RGB output image path
+#             ):
+    
+    #channels must have the same size
+    #if(...):
+        
+        #get dimensions
+        #...
+        
+        #initialize output image
+        #...
+        
+        #build 3 channel array
+        #... #R
+        #... #G
+        #... #B
+    
+        #if we want to write the bands to disk
+        #if(...):
+            #arr_2_file(...) #RGB
+        
+        #return ...
+
+    #else:
+        #print("arrays do not have the same size.")
+        #return None
+    
+#####################################################
+# function to read a calibration target charge file #
+#####################################################
+#def read_calib_file(...):
+    
+    #dictionary to store X,Y,Z calibrated data
+    #...
+    
+    #open the file
+    #...
+        
+        #skipe the 15 first lines
+        #...
+        
+        #iterate over the lines
+        #...
+            
+            #if we reach the end of the data
+            #...
+
+            #split the line
+            #...
+
+            #get the sample id
+            #...
+            
+            #get the X,Y,Z values
+            #...
+
+            #store the values in the dictionary
+            #...
+
+    #return ...
+
+###########################################
+# function to read image coordinates file #
+###########################################
+#def read_img_coords_file():
+
+    #dictionary to store the image coordinates
+    #...
+
+    #open the file
+    #...
+        
+        #iterate over the lines
+        #...
+            
+            #split the line
+            #...
+            
+            #get the sample id
+            #...
+            
+            #get the i,j values
+            #...
+
+            #store the values in the dictionary
+            #...
+
+    #return ...
+
+##########################################################################
+# function to plot a list of points (i,j) coordinates on top of an image #
+##########################################################################
+#def plot_pts_on_img(
+#                    numpy input array,
+#                    dictionnary with (i,j) coordinates,
+#                    bool to write the image to disk ?,
+#                    output image path,
+#                   ):
+
+    #create a figure and axis
+    #fig, ax = plt.subplots()
+
+    #display the image
+    #ax.imshow(img_arr)
+
+    #over plot the points by terating over the dictionnay
+    #...
+
+    #save the figure
+    #if(...):
+        #...
+        #print("Image successfully saved as: ",...)
+
+#####################################
+#function to get average pixel values
+#####################################
+#def getAvPxVal(
+#               input numpy array,
+#               i coordinate (int),
+#               j coordiante (int),
+#               window dimension (int)
+#               ):
+
+    #retreive a sub array
+    #...
+
+    #mean values for each band
+    #...
+    #...
+    #...
+    
+    #return ...
+
+####################################
+#function to estimate ICC parameters
+####################################
+#def estimICC(...):
+
+    # Transformation from RGB to XYZ color space:
+
+    #     [ X ]     [ A  B  C ]   [ r ]
+    #     [ Y ]  =  [ D  E  F ] * [ g ]
+    #     [ Z ]     [ G  H  I ]   [ b ]
+
+    # Developed form:
+
+    # X = A*r + B*g + C*b
+    # Y = D*r + E*g + F*b
+    # Z = G*r + H*g + I*b
+
+    # Where:
+    # - (r, g, b) are the input color values.
+    # - (X, Y, Z) are the output values in the XYZ color space.
+    # - The 3×3 matrix contains the transformation coefficients.
+    
+    #return ...
+
+##################################
+#function to appply ICC parameters
+##################################
+#def applyICC(...):
+        
+    #return ...
+
